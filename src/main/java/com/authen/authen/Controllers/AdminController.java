@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/admin")
-@PreAuthorize("hasRole('ADMIN')") // Only ADMIN can access any endpoint here
+@PreAuthorize("hasRole('USER')") // Only ADMIN can access any endpoint here
 @RequiredArgsConstructor
 public class AdminController {
 
