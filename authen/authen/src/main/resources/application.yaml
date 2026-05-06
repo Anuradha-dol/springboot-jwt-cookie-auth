@@ -13,8 +13,12 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update # 🔹 dev only, production use validate
+      ddl-auto: update
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
 
   mail:
     host: smtp.gmail.com
@@ -29,10 +33,11 @@ spring:
             enable: true
 
 jwt:
-  secret: "Y2hhbGxlbmdlVG9Xcml0ZUZ1bGxQcmVkaWN0YWJsZVNlY3JldEtleQ==" # 32 bytes base64
-
+  secret: "YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXowMTIzNDU2Nzg5IUAjJA=="
   cookie:
-    secure: false   # 🔹 true for prod
-    same-site: Lax  # 🔹 None for prod
+    secure: false
+    same-site: Lax
 
-
+app:
+  media:
+    root-dir: uploads

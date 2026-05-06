@@ -12,10 +12,10 @@ import {
   CircularProgress,
   InputAdornment,
   IconButton,
-  Grid,
   Fade,
   Zoom,
 } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import {
   VerifiedUser,
   Security,
@@ -383,7 +383,7 @@ export default function VerifyOtp() {
 
                 {/* Action Buttons */}
                 <Grid container spacing={2}>
-                  <Grid item xs={6}>
+                  <Grid size={6}>
                     <Button
                       fullWidth
                       variant="outlined"
@@ -395,7 +395,7 @@ export default function VerifyOtp() {
                       Back
                     </Button>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid size={6}>
                     <VerifyButton
                       fullWidth
                       type="submit"

@@ -4,7 +4,6 @@ import {
   Box,
   Typography,
   Button,
-  Grid,
   Paper,
   Stack,
   Card,
@@ -19,6 +18,7 @@ import {
   Divider,
   alpha
 } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import {
   RocketLaunch,
   Lock,
@@ -163,7 +163,7 @@ const SoloLaunchPage = () => {
       {/* Hero Section */}
       <Container maxWidth="lg" sx={{ pt: { xs: 15, md: 20 }, pb: 10 }}>
         <Grid container spacing={6} alignItems="center">
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Fade in={true} timeout={1000}>
               <Box>
                 <Chip
@@ -276,7 +276,7 @@ const SoloLaunchPage = () => {
             </Fade>
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Zoom in={true} timeout={1500}>
               <Box sx={{ position: 'relative' }}>
                 {/* Code Terminal Preview */}
@@ -429,7 +429,7 @@ const SoloLaunchPage = () => {
           {/* Feature Cards */}
           <Grid container spacing={4} sx={{ mt: 4 }}>
             {features.map((feature, index) => (
-              <Grid item xs={12} sm={6} key={index}>
+              <Grid size={{ xs: 12, sm: 6 }} key={index}>
                 <Slide in={true} direction="up" timeout={500 + index * 200}>
                   <Card
                     onMouseEnter={() => setActiveFeature(index)}
@@ -583,7 +583,7 @@ const SoloLaunchPage = () => {
       <Box sx={{ py: 6, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
         <Container maxWidth="lg">
           <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Stack direction="row" alignItems="center" spacing={1}>
                 <RocketLaunch sx={{ color: '#64ffda' }} />
                 <Typography variant="h6" sx={{ color: '#ccd6f6', fontWeight: 700 }}>
@@ -595,7 +595,7 @@ const SoloLaunchPage = () => {
               </Typography>
             </Grid>
             
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Stack direction="row" spacing={2} justifyContent="flex-end">
                 <IconButton
                   sx={{

@@ -11,13 +11,13 @@ import {
   Button,
   Typography,
   TextField,
-  Grid,
   Alert,
   CircularProgress,
   InputAdornment,
   IconButton,
   Link,
 } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import {
   Visibility,
   VisibilityOff,
@@ -204,7 +204,10 @@ export default function Signup() {
       console.error("Backend error:", err.response?.data);
       setMessage({
         type: "error",
-        text: err.response?.data?.message || "Something went wrong. Please try again.",
+        text:
+          err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Something went wrong. Please try again.",
       });
     } finally {
       setLoading(false);
@@ -222,7 +225,7 @@ export default function Signup() {
       case 0:
         return (
           <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <StyledTextField
                 fullWidth
                 label="First Name"
@@ -241,7 +244,7 @@ export default function Signup() {
                 placeholder="Enter your first name"
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <StyledTextField
                 fullWidth
                 label="Last Name"
@@ -266,7 +269,7 @@ export default function Signup() {
       case 1:
         return (
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+            <Grid size={12}>
               <StyledTextField
                 fullWidth
                 label="Email Address"
@@ -286,7 +289,7 @@ export default function Signup() {
                 placeholder="your.email@example.com"
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={12}>
               <StyledTextField
                 fullWidth
                 label="Temporary Email (Optional)"
@@ -306,7 +309,7 @@ export default function Signup() {
                 placeholder="temp.email@example.com"
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={12}>
               <StyledTextField
                 fullWidth
                 label="Phone Number"
@@ -331,7 +334,7 @@ export default function Signup() {
       case 2:
         return (
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+            <Grid size={12}>
               <StyledTextField
                 fullWidth
                 label="Password"
@@ -362,7 +365,7 @@ export default function Signup() {
                 placeholder="Create a strong password"
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={12}>
               <Alert severity="info" sx={{ mt: 2 }}>
                 <Typography variant="body2">
                   By signing up, you agree to our{" "}

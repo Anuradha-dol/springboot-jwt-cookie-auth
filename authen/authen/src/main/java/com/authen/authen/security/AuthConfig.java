@@ -1,6 +1,6 @@
 package com.authen.authen.security;
 
-import com.authen.authen.repos.UserRepo;
+import com.authen.authen.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

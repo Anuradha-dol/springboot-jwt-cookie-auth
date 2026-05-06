@@ -1,7 +1,6 @@
-package com.authen.authen.Service;
+package com.authen.authen.service;
 
-
-import com.authen.authen.dtos.MailBody;
+import com.authen.authen.records.AuthRecords;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,7 @@ public class EmailService {
         this.javaMailSender = javaMailSender;
     }
 
-    public  void sendSimpleMessasge(MailBody mailBody){
+    public void sendSimpleMessasge(AuthRecords.MailBody mailBody) {
 
 
         SimpleMailMessage message= new SimpleMailMessage();

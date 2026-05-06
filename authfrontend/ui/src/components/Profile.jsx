@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import {
   Box,
   Container,
-  Grid,
   Paper,
   Typography,
   Card,
@@ -34,6 +33,7 @@ import {
   Tooltip,
   Fab,
 } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import {
   Person as PersonIcon,
   Email as EmailIcon,
@@ -170,6 +170,7 @@ const StatBadge = styled(Box)(({ theme, color = "primary" }) => ({
 
 export default function Profile() {
   const navigate = useNavigate();
+  const backendBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -178,6 +179,8 @@ export default function Profile() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [avatarDialogOpen, setAvatarDialogOpen] = useState(false);
   const [editedProfile, setEditedProfile] = useState({});
+  const [selectedProfilePhoto, setSelectedProfilePhoto] = useState(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   
   // Mock data for demonstration
   const mockProfile = {
@@ -185,8 +188,10 @@ export default function Profile() {
     name: "Alex",
     lastName: "Johnson",
     email: "alex.johnson@example.com",
-    phonenumber: "0777911402",
+    phoneNumber: "0777911402",
     role: "Senior Developer",
+    profilePhotoUrl: null,
+    coverPhotoUrl: null,
     bio: "Passionate full-stack developer with 5+ years of experience in building scalable web applications.",
     location: "San Francisco, CA",
     company: "TechCorp Inc.",
@@ -232,6 +237,9 @@ export default function Profile() {
   };
 
   const handleEditProfile = () => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     setEditMode(true);
     setEditDialogOpen(true);
   };
@@ -266,9 +274,66 @@ export default function Profile() {
     });
   };
 
+  const resolveMediaUrl = (path) => {
+    if (!path) return "";
+    if (path.startsWith("http://") || path.startsWith("https://")) return path;
+    return `${backendBaseUrl}${path.startsWith("/") ? path : `/${path}`}`;
+  };
+
   const handleAvatarUpload = () => {
-    // Implement avatar upload logic
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     setAvatarDialogOpen(true);
+  };
+
+  const handleProfilePhotoUpload = async () => {
+    if (!selectedProfilePhoto) {
+      setError("Please select a profile image first");
+      return;
+    }
+
+    try {
+      setUploadingPhoto(true);
+      setError("");
+      const formData = new FormData();
+      formData.append("file", selectedProfilePhoto);
+      const res = await api.post("/user/me/profile-photo", formData, {
+        withCredentials: true,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setProfile(res.data);
+      setEditedProfile(res.data);
+      setAvatarDialogOpen(false);
+      setSelectedProfilePhoto(null);
+    } catch (err) {
+      console.error(err.response?.data || err);
+      setError(err.response?.data?.message || err.response?.data?.error || "Failed to upload profile photo");
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
+  const handleCoverPhotoUpload = async (file) => {
+    if (!file) return;
+
+    try {
+      setUploadingPhoto(true);
+      setError("");
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await api.post("/user/me/cover-photo", formData, {
+        withCredentials: true,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setProfile(res.data);
+      setEditedProfile(res.data);
+    } catch (err) {
+      console.error(err.response?.data || err);
+      setError(err.response?.data?.message || err.response?.data?.error || "Failed to upload cover photo");
+    } finally {
+      setUploadingPhoto(false);
+    }
   };
 
   const handleLogout = () => {
@@ -322,6 +387,24 @@ export default function Profile() {
         <Box sx={{ display: "flex", gap: 1 }}>
           <Button
             variant="outlined"
+            component="label"
+            startIcon={<CloudUploadIcon />}
+            disabled={uploadingPhoto}
+            sx={{ textTransform: "none" }}
+          >
+            Upload Cover
+            <input
+              type="file"
+              hidden
+              accept="image/*"
+              onChange={(e) => {
+                handleCoverPhotoUpload(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+          </Button>
+          <Button
+            variant="outlined"
             startIcon={<SettingsIcon />}
             onClick={() => navigate("/settings")}
             sx={{ textTransform: "none" }}
@@ -340,10 +423,20 @@ export default function Profile() {
       </Box>
 
       {/* Profile Header */}
-      <ProfileHeader>
+      <ProfileHeader
+        sx={
+          profile?.coverPhotoUrl
+            ? {
+                backgroundImage: `linear-gradient(135deg, rgba(25, 118, 210, 0.82) 0%, rgba(33, 203, 243, 0.72) 100%), url(${resolveMediaUrl(profile.coverPhotoUrl)})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }
+            : undefined
+        }
+      >
         <CardContent sx={{ position: "relative", zIndex: 1 }}>
           <Grid container spacing={3} alignItems="center">
-            <Grid item xs={12} md={3}>
+            <Grid size={{ xs: 12, md: 3 }}>
               <AvatarContainer>
                 <Avatar
                   sx={{
@@ -353,7 +446,12 @@ export default function Profile() {
                     fontSize: "2.5rem",
                     bgcolor: "primary.dark",
                   }}
-                  src="/static/images/avatar/1.jpg"
+                  slotProps={{
+                    img: {
+                      crossOrigin: "use-credentials",
+                    },
+                  }}
+                  src={profile?.profilePhotoUrl ? resolveMediaUrl(profile.profilePhotoUrl) : undefined}
                 >
                   {getInitials(profile?.name, profile?.lastName)}
                 </Avatar>
@@ -363,7 +461,7 @@ export default function Profile() {
               </AvatarContainer>
             </Grid>
 
-            <Grid item xs={12} md={9}>
+            <Grid size={{ xs: 12, md: 9 }}>
               <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 2, mb: 2 }}>
                 <Typography variant="h4" fontWeight="bold">
                   {profile?.name} {profile?.lastName}
@@ -410,7 +508,7 @@ export default function Profile() {
       {/* Main Content */}
       <Grid container spacing={3}>
         {/* Left Column - Personal Info */}
-        <Grid item xs={12} md={8}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <ProfilePaper>
             <Tabs
               value={tabValue}
@@ -429,7 +527,7 @@ export default function Profile() {
                 </Typography>
                 
                 <Grid container spacing={3}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <InfoCard>
                       <CardContent>
                         <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
@@ -447,7 +545,7 @@ export default function Profile() {
                     </InfoCard>
                   </Grid>
 
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <InfoCard>
                       <CardContent>
                         <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
@@ -465,7 +563,7 @@ export default function Profile() {
                     </InfoCard>
                   </Grid>
 
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <InfoCard>
                       <CardContent>
                         <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
@@ -483,7 +581,7 @@ export default function Profile() {
                     </InfoCard>
                   </Grid>
 
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <InfoCard>
                       <CardContent>
                         <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
@@ -602,7 +700,7 @@ export default function Profile() {
         </Grid>
 
         {/* Right Column - Stats & Actions */}
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           {/* Quick Stats */}
           <Card sx={{ mb: 3, borderRadius: 3 }}>
             <CardHeader
@@ -649,7 +747,7 @@ export default function Profile() {
             />
             <CardContent>
               <Grid container spacing={2}>
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <Button
                     fullWidth
                     variant="contained"
@@ -659,7 +757,7 @@ export default function Profile() {
                     Upload Photo
                   </Button>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <Button
                     fullWidth
                     variant="outlined"
@@ -669,7 +767,7 @@ export default function Profile() {
                     Notification Settings
                   </Button>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <Button
                     fullWidth
                     variant="outlined"
@@ -703,7 +801,7 @@ export default function Profile() {
         </DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 fullWidth
                 label="First Name"
@@ -713,7 +811,7 @@ export default function Profile() {
                 disabled={loading}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 fullWidth
                 label="Last Name"
@@ -723,7 +821,7 @@ export default function Profile() {
                 disabled={loading}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={12}>
               <TextField
                 fullWidth
                 label="Email"
@@ -733,7 +831,7 @@ export default function Profile() {
                 disabled={loading}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={12}>
               <TextField
                 fullWidth
                 label="Phone Number"
@@ -743,7 +841,7 @@ export default function Profile() {
                 disabled={loading}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={12}>
               <TextField
                 fullWidth
                 label="Bio"
@@ -755,7 +853,7 @@ export default function Profile() {
                 disabled={loading}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={12}>
               <TextField
                 fullWidth
                 label="Location"
@@ -811,13 +909,23 @@ export default function Profile() {
                 border: "3px dashed",
                 borderColor: "primary.main",
               }}
-              src="/static/images/avatar/1.jpg"
+              slotProps={{
+                img: {
+                  crossOrigin: "use-credentials",
+                },
+              }}
+              src={profile?.profilePhotoUrl ? resolveMediaUrl(profile.profilePhotoUrl) : undefined}
             >
               {getInitials(profile?.name, profile?.lastName)}
             </Avatar>
             <Typography variant="body2" color="text.secondary" gutterBottom>
               Upload a new profile picture
             </Typography>
+            {selectedProfilePhoto && (
+              <Typography variant="caption" color="text.secondary">
+                {selectedProfilePhoto.name}
+              </Typography>
+            )}
             <Button
               variant="contained"
               component="label"
@@ -825,16 +933,30 @@ export default function Profile() {
               sx={{ mt: 2 }}
             >
               Choose File
-              <input type="file" hidden accept="image/*" />
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={(e) => setSelectedProfilePhoto(e.target.files?.[0] || null)}
+              />
             </Button>
           </Box>
         </DialogContent>
         <DialogActions sx={{ p: 3 }}>
-          <Button onClick={() => setAvatarDialogOpen(false)}>
+          <Button
+            onClick={() => {
+              setAvatarDialogOpen(false);
+              setSelectedProfilePhoto(null);
+            }}
+          >
             Cancel
           </Button>
-          <Button variant="contained">
-            Upload
+          <Button
+            variant="contained"
+            onClick={handleProfilePhotoUpload}
+            disabled={!selectedProfilePhoto || uploadingPhoto}
+          >
+            {uploadingPhoto ? <CircularProgress size={18} color="inherit" /> : "Upload"}
           </Button>
         </DialogActions>
       </Dialog>

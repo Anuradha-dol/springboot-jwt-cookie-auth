@@ -1,5 +1,5 @@
 // src/components/Login.jsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import {
   Box,
@@ -12,7 +12,6 @@ import {
   CircularProgress,
   InputAdornment,
   IconButton,
-  Grid,
   Divider,
   Link,
   Fade,
@@ -20,6 +19,7 @@ import {
   Checkbox,
   FormControlLabel,
 } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import {
   Email,
   Lock,
@@ -222,14 +222,20 @@ export default function Login() {
 
     try {
       setLoading(true);
-      const res = await api.post("/auth/login", form, { 
+      const normalizedEmail = form.email.trim().toLowerCase();
+      const payload = {
+        email: normalizedEmail,
+        password: form.password,
+      };
+
+      const res = await api.post("/auth/login", payload, {
         withCredentials: true 
       });
 
       if (res.data.success) {
         // Save remember me preference
         if (form.rememberMe) {
-          localStorage.setItem("rememberedEmail", form.email);
+          localStorage.setItem("rememberedEmail", normalizedEmail);
         } else {
           localStorage.removeItem("rememberedEmail");
         }
@@ -259,9 +265,13 @@ export default function Login() {
       }
     } catch (err) {
       console.error("Login error:", err.response?.data || err);
-      const errorMessage = err.response?.data?.message || 
-                          err.response?.data?.error || 
-                          "Unable to connect to server. Please try again.";
+      const responseData = err.response?.data;
+      const errorMessage = (typeof responseData === "string"
+        ? responseData
+        : responseData?.message ||
+          responseData?.error ||
+          responseData?.detail ||
+          responseData?.title) || "Unable to connect to server. Please try again.";
       
       setMessage({
         type: "error",
@@ -283,7 +293,7 @@ export default function Login() {
   };
 
   // Pre-fill remembered email on component mount
-  useState(() => {
+  useEffect(() => {
     const rememberedEmail = localStorage.getItem("rememberedEmail");
     if (rememberedEmail) {
       setForm(prev => ({ ...prev, email: rememberedEmail, rememberMe: true }));
@@ -304,7 +314,7 @@ export default function Login() {
         <Zoom in={true} style={{ transitionDelay: '100ms' }}>
           <Grid container spacing={4}>
             {/* Left Side - Welcome/Illustration */}
-            <Grid item xs={12} md={5}>
+            <Grid size={{ xs: 12, md: 5 }}>
               <WelcomeIllustration>
                 <Box sx={{ position: "relative", zIndex: 1 }}>
                   <FloatingIcon>
@@ -344,7 +354,7 @@ export default function Login() {
             </Grid>
 
             {/* Right Side - Login Form */}
-            <Grid item xs={12} md={7}>
+            <Grid size={{ xs: 12, md: 7 }}>
               <LoginPaper>
                 {/* Header */}
                 <Box sx={{ mb: 4, textAlign: "center" }}>
@@ -379,7 +389,7 @@ export default function Login() {
                 {/* Login Form */}
                 <form onSubmit={handleSubmit}>
                   <Grid container spacing={3}>
-                    <Grid item xs={12}>
+                    <Grid size={12}>
                       <TextField
                         fullWidth
                         label="Email Address"
@@ -406,7 +416,7 @@ export default function Login() {
                       />
                     </Grid>
 
-                    <Grid item xs={12}>
+                    <Grid size={12}>
                       <TextField
                         fullWidth
                         label="Password"
@@ -444,7 +454,7 @@ export default function Login() {
                       />
                     </Grid>
 
-                    <Grid item xs={12}>
+                    <Grid size={12}>
                       <Box sx={{ 
                         display: "flex", 
                         justifyContent: "space-between", 
@@ -474,7 +484,7 @@ export default function Login() {
                       </Box>
                     </Grid>
 
-                    <Grid item xs={12}>
+                    <Grid size={12}>
                       <LoginButton
                         fullWidth
                         type="submit"
@@ -505,7 +515,7 @@ export default function Login() {
 
                 {/* Social Login Options */}
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={4}>
+                  <Grid size={{ xs: 12, sm: 4 }}>
                     <SocialButton
                       fullWidth
                       variant="outlined"
@@ -517,7 +527,7 @@ export default function Login() {
                       Google
                     </SocialButton>
                   </Grid>
-                  <Grid item xs={12} sm={4}>
+                  <Grid size={{ xs: 12, sm: 4 }}>
                     <SocialButton
                       fullWidth
                       variant="outlined"
@@ -529,7 +539,7 @@ export default function Login() {
                       Facebook
                     </SocialButton>
                   </Grid>
-                  <Grid item xs={12} sm={4}>
+                  <Grid size={{ xs: 12, sm: 4 }}>
                     <SocialButton
                       fullWidth
                       variant="outlined"
