@@ -1,8 +1,7 @@
 package com.authen.authen.dtos;
 
+import com.authen.authen.enums.Role;
 import lombok.*;
-
-import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor

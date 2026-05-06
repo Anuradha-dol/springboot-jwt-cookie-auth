@@ -1,16 +1,15 @@
-package com.authen.authen.Service;
+package com.authen.authen.service;
 
-import com.authen.authen.dtos.*;
-import com.authen.authen.entities.User;
+import com.authen.authen.dtos.AuthResponse;
+import com.authen.authen.records.AuthRecords;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
 
 public interface AuthService {
 
 
-    AuthResponse signUp(RegisterRequest registerRequest);
+    AuthResponse signUp(AuthRecords.RegisterRequest registerRequest);
 
-    AuthResponse SignIn(LoginRequest loginRequest, HttpServletResponse response);
+    AuthResponse SignIn(AuthRecords.LoginRequest loginRequest, HttpServletResponse response);
 
     AuthResponse verifyCode(String email, String verifyCode);
 

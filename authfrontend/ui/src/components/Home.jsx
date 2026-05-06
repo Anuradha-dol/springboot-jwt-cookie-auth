@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import {
   Box,
   Container,
-  Grid,
   Paper,
   Typography,
   Card,
@@ -18,6 +17,7 @@ import {
   LinearProgress,
   List,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Divider,
@@ -30,6 +30,7 @@ import {
   Drawer,
   ListItemAvatar,
 } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import {
   Notifications as NotificationsIcon,
   Task as TaskIcon,
@@ -166,6 +167,7 @@ const TaskProgress = styled(LinearProgress)(({ theme, value }) => ({
 
 export default function Home() {
   const navigate = useNavigate();
+  const backendBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -247,7 +249,16 @@ export default function Home() {
   };
 
   const handleDrawerToggle = () => {
+    if (!mobileOpen && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     setMobileOpen(!mobileOpen);
+  };
+
+  const resolveMediaUrl = (path) => {
+    if (!path) return "";
+    if (path.startsWith("http://") || path.startsWith("https://")) return path;
+    return `${backendBaseUrl}${path.startsWith("/") ? path : `/${path}`}`;
   };
 
   const taskProgress = data ? Math.round((data.completedTasks / data.tasks) * 100) : 0;
@@ -342,7 +353,12 @@ export default function Home() {
               <IconButton onClick={handleMenuOpen} sx={{ p: 0 }}>
                 <Avatar
                   alt="User Avatar"
-                  src="/static/images/avatar/1.jpg"
+                  slotProps={{
+                    img: {
+                      crossOrigin: "use-credentials",
+                    },
+                  }}
+                  src={data?.profilePhotoUrl ? resolveMediaUrl(data.profilePhotoUrl) : undefined}
                   sx={{ width: 40, height: 40, border: "2px solid white" }}
                 />
               </IconButton>
@@ -394,11 +410,13 @@ export default function Home() {
           </Typography>
           <List>
             {["Dashboard", "Projects", "Tasks", "Calendar", "Team", "Reports"].map((text) => (
-              <ListItem button key={text}>
-                <ListItemIcon>
-                  <DashboardIcon />
-                </ListItemIcon>
-                <ListItemText primary={text} />
+              <ListItem key={text} disablePadding>
+                <ListItemButton>
+                  <ListItemIcon>
+                    <DashboardIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={text} />
+                </ListItemButton>
               </ListItem>
             ))}
           </List>
@@ -412,7 +430,7 @@ export default function Home() {
           <WelcomeCard sx={{ mb: 4 }}>
             <CardContent>
               <Grid container alignItems="center" spacing={3}>
-                <Grid item xs={12} md={8}>
+                <Grid size={{ xs: 12, md: 8 }}>
                   <Typography variant="h4" gutterBottom fontWeight="bold">
                     {data?.welcomeMessage || "Welcome back!"}
                   </Typography>
@@ -434,7 +452,7 @@ export default function Home() {
                     />
                   </Box>
                 </Grid>
-                <Grid item xs={12} md={4} sx={{ textAlign: "center" }}>
+                <Grid size={{ xs: 12, md: 4 }} sx={{ textAlign: "center" }}>
                   <Box
                     sx={{
                       width: 120,
@@ -458,7 +476,7 @@ export default function Home() {
           {/* Quick Stats */}
           <Grid container spacing={3} sx={{ mb: 4 }}>
             {data?.quickStats?.map((stat, index) => (
-              <Grid item xs={12} sm={6} md={3} key={index}>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
                 <StatCard color={stat.color}>
                   <CardContent>
                     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
@@ -498,7 +516,7 @@ export default function Home() {
           {/* Main Content Grid */}
           <Grid container spacing={3}>
             {/* Left Column */}
-            <Grid item xs={12} lg={8}>
+            <Grid size={{ xs: 12, lg: 8 }}>
               {/* Tasks Overview */}
               <DashboardPaper sx={{ mb: 3 }}>
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
@@ -523,7 +541,7 @@ export default function Home() {
                 </Box>
 
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={4}>
+                  <Grid size={{ xs: 12, sm: 4 }}>
                     <Box sx={{ textAlign: "center", p: 2, bgcolor: "success.light", borderRadius: 2 }}>
                       <Typography variant="h4" fontWeight="bold" color="success.dark">
                         {data?.completedTasks || 0}
@@ -533,7 +551,7 @@ export default function Home() {
                       </Typography>
                     </Box>
                   </Grid>
-                  <Grid item xs={12} sm={4}>
+                  <Grid size={{ xs: 12, sm: 4 }}>
                     <Box sx={{ textAlign: "center", p: 2, bgcolor: "warning.light", borderRadius: 2 }}>
                       <Typography variant="h4" fontWeight="bold" color="warning.dark">
                         {data?.tasks ? data.tasks - data.completedTasks : 0}
@@ -543,7 +561,7 @@ export default function Home() {
                       </Typography>
                     </Box>
                   </Grid>
-                  <Grid item xs={12} sm={4}>
+                  <Grid size={{ xs: 12, sm: 4 }}>
                     <Box sx={{ textAlign: "center", p: 2, bgcolor: "info.light", borderRadius: 2 }}>
                       <Typography variant="h4" fontWeight="bold" color="info.dark">
                         {data?.upcomingTasks?.length || 0}
@@ -600,7 +618,7 @@ export default function Home() {
             </Grid>
 
             {/* Right Column */}
-            <Grid item xs={12} lg={4}>
+            <Grid size={{ xs: 12, lg: 4 }}>
               {/* Upcoming Tasks */}
               <DashboardPaper sx={{ mb: 3 }}>
                 <Typography variant="h6" fontWeight="bold" gutterBottom>

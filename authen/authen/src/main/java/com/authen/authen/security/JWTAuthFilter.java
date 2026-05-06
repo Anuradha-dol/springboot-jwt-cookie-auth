@@ -1,7 +1,7 @@
 package com.authen.authen.security;
 
-import com.authen.authen.dtos.Token;
-import com.authen.authen.utils.JwtUtils;
+import com.authen.authen.enums.Token;
+import com.authen.authen.util.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
