@@ -1,4 +1,33 @@
 # IDE metadata
 .idea/
 *.iml
+.vscode/
+
+# Java / Spring Boot
 target/
+authen/authen/target/
+authen/authen/src/main/resources/application-local.yaml
+authen/authen/src/main/resources/application-*.local.yaml
+
+# Node / Vite
+node_modules/
+authfrontend/node_modules/
+authfrontend/ui/node_modules/
+authfrontend/ui/dist/
+authfrontend/ui/dist-ssr/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+!authfrontend/ui/.env.example
+
+# Runtime uploaded media
+uploads/
