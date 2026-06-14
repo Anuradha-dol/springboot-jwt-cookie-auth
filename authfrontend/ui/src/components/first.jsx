@@ -48,11 +48,11 @@ const SoloLaunchPage = () => {
 
   const techStack = [
     { name: 'React', color: '#61DAFB' },
-    { name: 'JWT', color: '#000000' },
+    { name: 'Spring Boot', color: '#6DB33F' },
+    { name: 'PostgreSQL', color: '#336791' },
     { name: 'Material-UI', color: '#007FFF' },
-    { name: 'Node.js', color: '#339933' },
-    { name: 'MongoDB', color: '#47A248' },
-    { name: 'Redis', color: '#DC382D' }
+    { name: 'JWT', color: '#000000' },
+    { name: 'Spring Security', color: '#6DB33F' }
   ];
 
   const features = [
@@ -60,13 +60,13 @@ const SoloLaunchPage = () => {
       icon: <Security />,
       title: 'JWT Authentication',
       description: 'Industry-standard JSON Web Tokens with secure HTTP-only cookies',
-      details: 'Stateless authentication with automatic refresh tokens'
+      details: 'Stateless authentication using access and refresh token cookies'
     },
     {
       icon: <Email />,
       title: 'Email OTP Verification',
-      description: 'Two-factor authentication via email OTP',
-      details: 'Secure login codes delivered to registered email'
+      description: 'Account verification and recovery through email OTP',
+      details: 'Verification codes are delivered to registered email addresses'
     },
     {
       icon: <Lock />,
@@ -308,7 +308,7 @@ const SoloLaunchPage = () => {
                       <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#27ca3f' }} />
                     </Stack>
                     <Typography variant="caption" sx={{ ml: 2, color: '#64ffda' }}>
-                      auth-system.js
+                      auth-portal
                     </Typography>
                   </Box>
 
@@ -316,7 +316,7 @@ const SoloLaunchPage = () => {
                   <Box sx={{ p: 3, fontFamily: 'monospace', fontSize: '0.9rem' }}>
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="caption" sx={{ color: '#64ffda' }}>
-                        $ npm init auth-system
+                        $ mvnw spring-boot:run
                       </Typography>
                     </Box>
                     
@@ -352,7 +352,7 @@ const SoloLaunchPage = () => {
                         Authentication system ready!
                       </Typography>
                       <Typography sx={{ color: '#8892b0' }}>
-                        Visit http://localhost:3000 to get started
+                        Visit http://localhost:5173 to get started
                       </Typography>
                     </Box>
                   </Box>

@@ -1,8 +1,10 @@
 package com.authen.authen.controller;
 
 import com.authen.authen.dtos.AuthResponse;
+import com.authen.authen.enums.Token;
 import com.authen.authen.records.AuthRecords;
 import com.authen.authen.service.AuthService;
+import com.authen.authen.util.JwtUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtUtils jwtUtils;
 
     // ================= REGISTER =================
     @PostMapping("/register")
@@ -97,8 +100,31 @@ public class AuthController {
         return ResponseEntity.ok(authService.resendOtp(email));
     }
 
+    // ================= LOGOUT =================
+    @PostMapping("/logout")
+    public ResponseEntity<AuthResponse> logout(HttpServletResponse response) {
+        jwtUtils.removeToken(response, Token.ACCESS);
+        jwtUtils.removeToken(response, Token.REFRESH);
+        jwtUtils.removeToken(response, Token.VERIFY);
+        expireCookie(response, "userEmail", null);
+        expireCookie(response, "userEmail", "localhost");
+        expireCookie(response, "forgotEmail", null);
 
+        return ResponseEntity.ok(AuthResponse.builder()
+                .message("Logged out successfully.")
+                .success(true)
+                .build());
+    }
 
-
-
+    private void expireCookie(HttpServletResponse response, String name, String domain) {
+        Cookie cookie = new Cookie(name, "");
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        cookie.setSecure(false);
+        if (domain != null) {
+            cookie.setDomain(domain);
+        }
+        response.addCookie(cookie);
+    }
 }
