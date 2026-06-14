@@ -2,3 +2,19 @@
 .idea/
 *.iml
 target/
+# Local editor files
+**/.idea/
+.vscode/
+**/.vscode/
+# Dependencies and build output
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+build/
+**/build/
+**/target/
+# Local secrets
+.env
+.env.*
+!.env.example
